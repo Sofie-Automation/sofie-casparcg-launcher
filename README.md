@@ -1,10 +1,10 @@
 # Sofie CasparCG Server Launcher
-This is the _CasparCG Server Launcher_ application, part of the [**Sofie** TV Automation System](https://github.com/nrkno/Sofie-TV-automation/). 
+This is the _CasparCG Server Launcher_ application, part of the [**Sofie** TV Automation System](https://github.com/Sofie-Automation/Sofie-TV-automation/).
 
 
 ## General Sofie System Information
-* [_Sofie_ Documentation](https://nrkno.github.io/sofie-core/)
-* [_Sofie_ Releases](https://nrkno.github.io/sofie-core/releases)
+* [_Sofie_ Documentation](https://sofie-automation.github.io/sofie-core//)
+* [_Sofie_ Releases](https://sofie-automation.github.io/sofie-core//releases)
 * [Contribution Guidelines](CONTRIBUTING.md)
 * [License](LICENSE)
 

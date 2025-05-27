@@ -40,4 +40,4 @@ script:
 - yarn run build
 branches:
   only:
-  - master
+  - main
