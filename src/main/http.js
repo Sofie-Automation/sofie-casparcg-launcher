@@ -5,6 +5,7 @@ import fs from 'fs'
 import log from 'electron-log'
 
 import { getBasePath } from './util'
+import { serveIndexTemplate } from './serveIndex'
 
 export class HttpMonitor {
   constructor(config, processes) {
@@ -102,7 +103,13 @@ export class HttpMonitor {
           p.path = path.join(basePath, p.path)
         }
 
-        const handlers = [express.static(p.path), serveIndex(p.path)]
+        const handlers = [
+          express.static(p.path),
+          serveIndex(p.path, {
+            view: 'details',
+            template: serveIndexTemplate,
+          }),
+        ]
 
         if (p.allowDelete) {
           // Add a handler for delete
