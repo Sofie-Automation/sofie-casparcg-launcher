@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>listing directory {{directory}}</title>
+    <style>
+        {{style}}
+        .view-details .size, .view-details .date {
+            direction: ltr;
+        }
+        .header {
+          user-select: none;
+        }
+        li {
+          padding-right: 10px;
+        }
+        span.asc::after {
+          content: " ↓";
+        }
+        span.desc::after {
+          content: " ↑";
+        }
+        li a {
+          padding-right: 10px;
+          margin-right: -10px;
+        }
+    </style>
+    <script>
+      let sorting = 'name'
+      let order = 'asc'
+      let prevSortHeader = null
+      function $(id) {
+        var el = 'string' == typeof id ? document.getElementById(id) : id
+
+        el.on = function (event, fn) {
+          if ('content loaded' == event) {
+            event = window.attachEvent ? 'load' : 'DOMContentLoaded'
+          }
+          el.addEventListener ? el.addEventListener(event, fn, false) : el.attachEvent('on' + event, fn)
+        }
+
+        el.all = function (selector) {
+          return $(el.querySelectorAll(selector))
+        }
+
+        el.each = function (fn) {
+          for (var i = 0, len = el.length; i < len; ++i) {
+            fn($(el[i]), i)
+          }
+        }
+
+        el.getClasses = function () {
+          return this.getAttribute('class').split(/\s+/)
+        }
+
+        el.addClass = function (name) {
+          var classes = this.getAttribute('class')
+          el.setAttribute('class', classes ? classes + ' ' + name : name)
+        }
+
+        el.removeClass = function (name) {
+          var classes = this.getClasses().filter(function (curr) {
+            return curr != name
+          })
+          this.setAttribute('class', classes.join(' '))
+        }
+
+        return el
+      }
+
+      function search() {
+        var str = $('search').value.toLowerCase()
+        var links = $('files').all('a')
+
+        links.each(function (link) {
+          var text = link.textContent.toLowerCase()
+
+          if ('..' == text) return
+          if (str.length && ~text.indexOf(str)) {
+            link.addClass('highlight')
+          } else {
+            link.removeClass('highlight')
+          }
+        })
+      }
+
+      const compareByName = (a, b) => {
+        const valA = a.querySelector('.name').textContent.trim()
+        const valB = b.querySelector('.name').textContent.trim()
+        return order === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA)
+      }
+
+      const compareBySize = (a, b) => {
+        const valA = parseFloat(a.querySelector('.size').dataset.bytes || '0')
+        const valB = parseFloat(b.querySelector('.size').dataset.bytes || '0')
+        return order === 'asc' ? valA - valB : valB - valA
+      }
+
+      const compareByDate = (a, b)  => {
+        const valA = parseFloat(a.querySelector('.date').dataset.timestamp || '0', 10)
+        const valB = parseFloat(b.querySelector('.date').dataset.timestamp || '0', 10)
+        return order === 'asc' ? valA - valB : valB - valA
+      }
+
+      function sort(by) {
+        if (sorting === by) {
+          if (order === 'asc') {
+            order = 'desc'
+          } else {
+            order = 'asc'
+          }
+        } else {
+          order = 'desc'
+        }
+        sorting = by
+        const ul = document.getElementById('files')
+        var items = Array.from(ul.querySelectorAll('li'))
+        items.shift()
+        const folders = items.filter((item) => item.classList.contains('directory'))
+        items = items.filter((item) => !item.classList.contains('directory'))
+        switch (sorting) {
+          case 'name':
+            folders.sort(compareByName)
+            items.sort(compareByName)
+            break
+          case 'size':
+            items.sort(compareBySize)
+            break
+          case 'date':
+            folders.sort(compareByDate)
+            items.sort(compareByDate)
+            break
+        }
+        folders.forEach((item) => ul.appendChild(item))
+        items.forEach((item) => ul.appendChild(item))
+      }
+
+      $(window).on('content loaded', function () {
+        $('search').on('keyup', search)
+        $('header')
+          .all('span')
+          .each((el) => {
+            el.on('click', (ev) => {
+              if (prevSortHeader) {
+                prevSortHeader.removeClass(order)
+              }
+              sort(ev.target.classList[0])
+              prevSortHeader = ev.target
+              ev.target.addClass(order)
+            })
+          })
+      })
+    </script>
+  </head>
+  <body class="directory">
+    <input id="search" type="text" placeholder="Search" autocomplete="off" />
+    <div id="wrapper">
+      <h1><a href="/">~</a>{{linked-path}}</h1>
+      {{files}}
+    </div>
+  </body>
+</html>
