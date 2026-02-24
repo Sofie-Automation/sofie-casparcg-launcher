@@ -182,7 +182,9 @@ app.on('ready', () => {
 		// file:// protocol extra privileges (grantFileProtocolExtraPrivileges fuse).
 		protocol.handle('app', (request) => {
 			const { pathname } = new URL(request.url)
-			const filePath = path.join(import.meta.dirname, '../../dist/renderer', decodeURIComponent(pathname))
+			const baseDir = path.join(import.meta.dirname, '../../dist/renderer')
+			const relPath = decodeURIComponent(pathname || '/').replace(/^\/+/, '')
+			const filePath = path.join(baseDir, relPath)
 			return net.fetch(pathToFileURL(filePath).toString())
 		})
 	}

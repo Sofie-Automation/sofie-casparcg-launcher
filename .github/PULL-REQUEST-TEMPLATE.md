@@ -22,7 +22,7 @@ Bug fix / Feature / Code improvement / Documentation improvement / Other (please
 
 <!--
 Please describe how things worked before this PR.
-If it's a bug fixe: Describe the bug (what was happening?)
+If it's a bug fix: Describe the bug (what was happening?)
 -->
 
 ## New Behavior
@@ -55,4 +55,4 @@ If they're not, please open the PR as a Draft.
 - [ ] PR is ready to be reviewed.
 - [ ] The functionality has been tested by the author.
 - [ ] Relevant unit tests has been added / updated.
-- [ ] Relevant documentation (code comments, [system documentation](https://sofie-automation.github.io/sofie-core//)) has been added / updated.
+- [ ] Relevant documentation (code comments, [system documentation](https://sofie-automation.github.io/sofie-core/)) has been added / updated.
