@@ -1,5 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import Settings from '../components/Settings'
+import ProcessTab from '../components/ProcessTab'
+import Status from '../components/Status'
 
 Vue.use(Router)
 
@@ -8,17 +11,17 @@ export default new Router({
     {
       path: '/settings',
       name: 'settings-page',
-      component: require('../components/Settings').default,
+      component: Settings,
     },
     {
       path: '/:id',
       name: 'process-page',
-      component: require('../components/ProcessTab').default,
+      component: ProcessTab,
     },
     {
       path: '/',
       name: 'status-page',
-      component: require('../components/Status').default,
+      component: Status,
     },
     {
       path: '*',

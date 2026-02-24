@@ -322,8 +322,8 @@
 </template>
 
 <script>
-const { ipcRenderer } = require('electron')
-const packageJson = require('../../../package.json')
+import { ipcRenderer } from 'electron'
+import packageJson from '../../../package.json'
 
 export default {
   data() {

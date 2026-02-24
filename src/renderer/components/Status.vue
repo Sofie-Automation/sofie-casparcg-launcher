@@ -18,8 +18,8 @@
 </template>
 
 <script>
+import { ipcRenderer } from 'electron'
 import ProcessControls from './ProcessControls'
-const { ipcRenderer } = require('electron')
 
 export default {
   components: {

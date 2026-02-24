@@ -11,6 +11,7 @@ yarn-error.log
 thumbs.db
 !.gitkeep
 logs/
+dist/
 
 casparcg-launcher.config.json
 

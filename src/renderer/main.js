@@ -13,7 +13,6 @@ import store from './store'
 import smoothscroll from 'smoothscroll-polyfill'
 smoothscroll.polyfill()
 
-if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.config.productionTip = false
 
 ipcRenderer.on('process.log', (e, data) => {
