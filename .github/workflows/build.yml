@@ -1,0 +1,118 @@
+name: Build
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+# Default to read-only; individual jobs elevate as needed.
+permissions:
+  contents: read
+
+jobs:
+  # ── Build ────────────────────────────────────────────────────────────────────
+  build:
+    name: Build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_path: 'build/*.AppImage'
+            artifact_name: linux
+          - os: windows-latest
+            artifact_path: 'build/*.exe'
+            artifact_name: windows
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Enable Corepack (Yarn 4)
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build
+        run: yarn build
+        # CSC_IDENTITY_AUTO_DISCOVERY=false stops electron-builder searching for
+        # code-signing certificates on macOS agents (not relevant here, just defensive).
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_path }}
+          if-no-files-found: error
+          retention-days: 7
+
+  # ── Release ──────────────────────────────────────────────────────────────────
+  # Runs only on tag pushes. Creates a GitHub release (if absent) and attaches
+  # the binaries built above.
+  release:
+    name: Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write # needed to create releases and upload assets
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true # flatten all artifacts into one directory
+
+      - name: Extract changelog for this release
+        id: changelog
+        run: |
+          node --input-type=module << 'EOF'
+          import { readFileSync, writeFileSync } from 'fs'
+
+          const changelog = readFileSync('CHANGELOG.md', 'utf8')
+
+          // Split on the version heading lines (## [x.y.z] or ## x.y.z)
+          // Keep the delimiter by using a lookahead so we can re-attach it.
+          const parts = changelog.split(/(?=^## )/m)
+
+          // parts[0] is the preamble ("# Changelog\n\n..."), parts[1] is latest version, etc.
+          const latest = parts.find((p) => p.startsWith('## '))
+
+          if (!latest) {
+            console.warn('Could not find any version sections in CHANGELOG.md')
+            writeFileSync('release-notes.md', '')
+            process.exit(0)
+          }
+
+          // Strip the heading line itself — the release title already shows the version.
+          const body = latest.split('\n').slice(1).join('\n').trim()
+          writeFileSync('release-notes.md', body)
+          console.log('Extracted release notes:\n' + body)
+          EOF
+
+      - name: Create or update GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          body_path: release-notes.md
+          # Mark as pre-release if the tag contains a pre-release identifier
+          # (e.g. v2.0.0-beta.1, v2.0.0-0).
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          fail_on_unmatched_files: true

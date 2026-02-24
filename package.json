@@ -7,8 +7,8 @@
   "main": "./src/main/index.js",
   "type": "module",
   "scripts": {
-    "build": "yarn build:vite && electron-builder",
-    "build:dir": "yarn build:vite && electron-builder --dir",
+    "build": "yarn build:vite && electron-builder --publish never",
+    "build:dir": "yarn build:vite && electron-builder --dir --publish never",
     "dev": "node scripts/dev-vite.mjs",
     "build:vite": "vite build --config vite.renderer.config.js",
     "lint": "eslint --ext .js,.vue src",
