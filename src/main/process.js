@@ -177,8 +177,13 @@ export class ProcessMonitor {
 	}
 
 	sendCommand(command) {
-		if (this.process && this.config.sendCommands) {
-			this.process.write(command, this.config.sendCommands)
+		let sendCommandFormat = this.config.sendCommands
+		if (this.process && sendCommandFormat) {
+			if (process.platform === 'linux' && sendCommandFormat === 'utf16le') {
+				sendCommandFormat = 'utf8' // CasparCG uses utf8 on linux utf16le
+			}
+
+			this.process.write(command, sendCommandFormat)
 		}
 	}
 
