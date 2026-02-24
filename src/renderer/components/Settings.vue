@@ -191,6 +191,41 @@
 												</b-form-group>
 
 												<b-form-group
+													label="Startup Commands"
+													:label-for="'startupCommands' + index"
+													label-cols-sm="4"
+													label-cols-lg="3"
+													content-cols-sm
+													content-cols-lg="7"
+													description="Commands to send over IPC after the process starts (one per line). Requires Send Commands to be enabled."
+												>
+													<b-form-textarea
+														:id="'startupCommands' + index"
+														v-model="config.processes[index].startupCommands"
+														rows="4"
+														placeholder="Enter commands, one per line"
+													/>
+												</b-form-group>
+
+												<b-form-group
+													label="Startup Commands Delay (ms)"
+													:label-for="'startupCommandsDelay' + index"
+													label-cols-sm="4"
+													label-cols-lg="3"
+													content-cols-sm
+													content-cols-lg="7"
+													description="Milliseconds to wait after process start before sending startup commands."
+												>
+													<b-form-input
+														:id="'startupCommandsDelay' + index"
+														v-model.number="config.processes[index].startupCommandsDelay"
+														type="number"
+														min="0"
+														placeholder="0"
+													/>
+												</b-form-group>
+
+												<b-form-group
 													label="Save Log"
 													:label-for="'processLog' + index"
 													label-cols-sm="4"
@@ -310,8 +345,10 @@
 			</b-row>
 			<b-row id="footer">
 				<b-col>
-					<b-button type="submit" variant="primary"> Save </b-button>
-					<b-button type="reset" variant="danger"> Reset </b-button>
+					<b-button-group>
+						<b-button type="submit" variant="primary"> Save </b-button>
+						<b-button type="reset" variant="danger"> Reset </b-button>
+					</b-button-group>
 				</b-col>
 				<b-col id="version">
 					<p class="text-right">Version: {{ version }}</p>

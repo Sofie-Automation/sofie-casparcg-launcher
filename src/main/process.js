@@ -137,11 +137,38 @@ export class ProcessMonitor {
 		})
 		this.process.on('spawn', (process) => {
 			log.info('[' + this.id + '] ' + this.config.exeName + ' spawn ' + process.pid)
-
 			this.pipeLog('event', '== Process is starting ==')
+
+			// Cancel any pending startup commands from a previous spawn
+			clearTimeout(this._startupCommandsTimeout)
+			this._startupCommandsTimeout = undefined
+
+			const startupCommands = this.config.startupCommands
+			if (startupCommands && this.config.sendCommands) {
+				const commands = startupCommands
+					.split('\n')
+					.map((l) => l.trim())
+					.filter((l) => l.length > 0)
+				if (commands.length > 0) {
+					const delay = this.config.startupCommandsDelay || 0
+					this._startupCommandsTimeout = setTimeout(() => {
+						this._startupCommandsTimeout = undefined
+						if (this.running()) {
+							log.info('[' + this.id + '] Sending ' + commands.length + ' startup command(s) (delay: ' + delay + 'ms)')
+							this.pipeLog('event', '== Sending startup commands ==')
+							for (const cmd of commands) {
+								this.sendCommand(cmd)
+							}
+						}
+					}, delay)
+				}
+			}
 		})
 		this.process.on('exit', (code, signal) => {
 			log.info('[' + this.id + '] ' + this.config.exeName + ' exit ' + code + ' ' + signal)
+
+			clearTimeout(this._startupCommandsTimeout)
+			this._startupCommandsTimeout = undefined
 
 			this.pipeLog('event', '== Process has exited with code ' + code + ' ==')
 		})
