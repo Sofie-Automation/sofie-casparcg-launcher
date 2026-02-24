@@ -4,7 +4,6 @@ import path from 'path'
 import fs from 'fs'
 import { parseArgsStringToArgv } from 'string-argv'
 import equal from 'deep-equal'
-import moment from 'moment'
 
 import { CasparCGHealthMonitor } from './casparcg.js'
 
@@ -236,7 +235,11 @@ export class ProcessMonitor {
         return
       }
 
-      const targetName = this.config.name + '_' + moment().format('YYYY-MM-DD') + '.log'
+      const now = new Date()
+      const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(
+        now.getDate()
+      ).padStart(2, '0')}`
+      const targetName = this.config.name + '_' + dateStr + '.log'
       if (targetName === this.logFile) {
         // Correct handle already open
         return

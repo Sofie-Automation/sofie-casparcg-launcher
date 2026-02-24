@@ -1409,7 +1409,6 @@ __metadata:
     eslint-plugin-vue: "npm:^7.0.0-alpha.5"
     express: "npm:^4.16.3"
     jquery: "npm:^3.3.1"
-    moment: "npm:^2.22.2"
     prettier: "npm:^2.0.5"
     pretty-bytes: "npm:5.6.0"
     ps-tree: "npm:^1.2.0"
@@ -4727,13 +4726,6 @@ __metadata:
   version: 1.0.1
   resolution: "modify-values@npm:1.0.1"
   checksum: 10c0/6acb1b82aaf7a02f9f7b554b20cbfc159f223a79c66b0a257511c5933d50b85e12ea1220b0a90a2af6f80bc29ff784f929a52a51881867a93ae6a12ce87a729a
-  languageName: node
-  linkType: hard
-
-"moment@npm:^2.22.2":
-  version: 2.26.0
-  resolution: "moment@npm:2.26.0"
-  checksum: 10c0/217f5fb0e3f86f2d7386d7ae4c85885ae38c75b05b9de78ecd993135fc4baae71d21e1fb7b060605e9cd95fd41c2b60d03ca958b11175af6494252e34e9cff64
   languageName: node
   linkType: hard
 
