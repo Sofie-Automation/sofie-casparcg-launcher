@@ -809,7 +809,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitejs/plugin-vue2@npm:^2.3.0":
+"@vitejs/plugin-vue2@npm:^2.3.4":
   version: 2.3.4
   resolution: "@vitejs/plugin-vue2@npm:2.3.4"
   peerDependencies:
@@ -1392,8 +1392,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "casparcg-launcher@workspace:."
   dependencies:
-    "@vitejs/plugin-vue2": "npm:^2.3.0"
+    "@vitejs/plugin-vue2": "npm:^2.3.4"
     bootstrap-vue: "npm:^2.15.0"
+    chokidar: "npm:^4.0.3"
     conf: "npm:^6.2.4"
     deep-equal: "npm:^2.0.3"
     electron: "npm:40.6.0"
@@ -1465,7 +1466,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chokidar@npm:^4.0.0":
+"chokidar@npm:^4.0.0, chokidar@npm:^4.0.3":
   version: 4.0.3
   resolution: "chokidar@npm:4.0.3"
   dependencies:

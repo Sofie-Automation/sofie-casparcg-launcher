@@ -9,7 +9,7 @@
   "scripts": {
     "build": "yarn build:vite && electron-builder",
     "build:dir": "yarn build:vite && electron-builder --dir",
-    "dev:vite": "node scripts/dev-vite.mjs",
+    "dev": "node scripts/dev-vite.mjs",
     "build:vite": "vite build --config vite.renderer.config.js",
     "lint": "eslint --ext .js,.vue src",
     "lint:fix": "eslint --ext .js,.vue --fix src",
@@ -82,7 +82,8 @@
     "xtend": "^4.0.1"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue2": "^2.3.0",
+    "@vitejs/plugin-vue2": "^2.3.4",
+    "chokidar": "^4.0.3",
     "electron": "40.6.0",
     "electron-builder": "^22.7.0",
     "electron-debug": "^3.1.0",

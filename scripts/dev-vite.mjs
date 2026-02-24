@@ -1,24 +1,27 @@
 /**
- * Vite-based dev runner.
+ * Dev runner: starts the Vite renderer dev server then spawns Electron.
+ * Watches src/main/** and restarts Electron when main-process files change.
  *
- * Usage:  yarn dev:vite
- *
- * 1. Starts the Vite renderer dev server on port 9080.
- * 2. Spawns Electron pointing at src/main/index.dev.mjs, which in turn
- *    connects to the Vite server at http://localhost:9080.
+ * Usage: yarn dev
  */
 
 import { createServer } from 'vite'
 import { spawn } from 'child_process'
 import { createRequire } from 'module'
 import { resolve } from 'path'
+import chokidar from 'chokidar'
 
 const require = createRequire(import.meta.url)
+const electronBin = require('electron')
+const ROOT = resolve(import.meta.dirname, '..')
+
+let electronProcess = null
+let restarting = false
 
 async function main() {
-  // ── 1. Start Vite ────────────────────────────────────────────────────────────
+  // ── 1. Start Vite renderer dev server ────────────────────────────────────────
   const server = await createServer({
-    configFile: resolve(import.meta.dirname, '../vite.renderer.config.js'),
+    configFile: resolve(ROOT, 'vite.renderer.config.js'),
     mode: 'development',
   })
 
@@ -27,37 +30,45 @@ async function main() {
 
   const address = server.httpServer.address()
   const port = typeof address === 'object' ? address.port : 9080
-  console.log(`\n  [dev-vite] renderer dev server ready on http://localhost:${port}\n`)
+  const devServerUrl = `http://localhost:${port}`
 
-  // ── 2. Spawn Electron ─────────────────────────────────────────────────────────
-  // The `electron` package exports the path to the Electron binary.
-  const electronBin = require('electron')
-
-  const electronProcess = spawn(
-    electronBin,
-    [
-      '--inspect=5858', // Node inspector for main process debugging
-      resolve(import.meta.dirname, '../src/main/index.dev.mjs'),
-    ],
-    {
+  // ── 2. Electron spawn / restart helper ───────────────────────────────────────
+  function spawnElectron() {
+    electronProcess = spawn(electronBin, ['--inspect=5858', resolve(ROOT, 'src/main/index.dev.mjs')], {
       stdio: 'inherit',
-      env: {
-        ...process.env,
-        NODE_ENV: 'development',
-        // Pass the actual port in case it was altered by strictPort fallback
-        VITE_DEV_SERVER_URL: `http://localhost:${port}`,
-      },
-    }
-  )
+      env: { ...process.env, NODE_ENV: 'development', VITE_DEV_SERVER_URL: devServerUrl },
+    })
 
-  // ── 3. Lifecycle ──────────────────────────────────────────────────────────────
-  electronProcess.on('close', (code) => {
-    server.close()
-    process.exit(code ?? 0)
+    electronProcess.on('close', (code) => {
+      if (restarting) return
+      // User closed the window — shut everything down
+      server.close()
+      process.exit(code ?? 0)
+    })
+  }
+
+  spawnElectron()
+
+  // ── 3. Watch main-process source and restart on changes ───────────────────────
+  let debounceTimer = null
+
+  chokidar.watch(resolve(ROOT, 'src/main'), { ignoreInitial: true }).on('all', (event, file) => {
+    clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => {
+      console.log(`\n  [dev] main changed (${event}: ${file.replace(ROOT + '/', '')}) — restarting Electron...\n`)
+      restarting = true
+      electronProcess.kill()
+      electronProcess.once('close', () => {
+        restarting = false
+        spawnElectron()
+      })
+    }, 300)
   })
 
+  // ── 4. Lifecycle ──────────────────────────────────────────────────────────────
   const shutdown = () => {
-    electronProcess.kill()
+    restarting = true // prevent exit-on-close triggering twice
+    electronProcess?.kill()
     server.close()
     process.exit(0)
   }
@@ -67,6 +78,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error('[dev-vite] fatal:', err)
+  console.error('[dev] fatal:', err)
   process.exit(1)
 })
