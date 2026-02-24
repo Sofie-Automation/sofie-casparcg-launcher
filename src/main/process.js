@@ -95,6 +95,11 @@ export class ProcessMonitor {
 		this.process = respawn([exeName].concat(parseArgsStringToArgv(args)), {
 			cwd,
 			env: this.config.env ? Object.fromEntries(this.config.env.map((obj) => [obj.id, obj.value])) : undefined,
+			// On POSIX, spawn as a new process group leader so that a single
+			// process.kill(-pid, signal) from the SIGTERM handler reaches the
+			// entire child process tree (grandchildren included). On Windows,
+			// respawn already uses "taskkill /T /F" to kill the full tree.
+			detached: process.platform !== 'win32',
 		})
 
 		this.process.on('start', () => {
@@ -161,6 +166,13 @@ export class ProcessMonitor {
 		this.restarting = false
 		if (this.process) {
 			this.process.stop(cb)
+		}
+	}
+
+	/** Synchronously kill the child process tree without waiting for ps-tree. */
+	killSync() {
+		if (this.process) {
+			this.process.killSync()
 		}
 	}
 
