@@ -20,14 +20,6 @@ protocol.registerSchemesAsPrivileged([
 
 const isProduction = process.env.NODE_ENV !== 'development'
 
-/**
- * Set `__static` path to static files in production
- * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
- */
-if (isProduction) {
-	global.__static = path.join(import.meta.dirname, '/static').replace(/\\/g, '\\\\')
-}
-
 log.transports.file.level = 'info'
 
 process.on('uncaughtException', function (err) {

@@ -3,9 +3,17 @@ import escapeHtml from 'escape-html'
 import prettyBytes from 'pretty-bytes'
 
 import path, { normalize, sep } from 'path'
+// eslint-disable-next-line n/no-unpublished-import
+import { app } from 'electron'
+
+// In production, static/ is copied to resources/static/ via extraResources.
+// In dev, it lives at the project root (three levels up from src/main/serveIndex/).
+const staticDir = app.isPackaged
+	? path.join(process.resourcesPath, 'static')
+	: path.join(import.meta.dirname, '../../../static')
 
 export const serveIndexTemplate = (locals, callback) => {
-	fs.readFile(path.join(import.meta.dirname, '../../../static/directory.html'), 'utf8', (err, str) => {
+	fs.readFile(path.join(staticDir, 'directory.html'), 'utf8', (err, str) => {
 		if (err) {
 			return callback(err)
 		}
