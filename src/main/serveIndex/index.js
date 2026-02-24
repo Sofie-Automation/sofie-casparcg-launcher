@@ -1,5 +1,5 @@
 import fs from 'fs'
-import * as escapeHtml from 'escape-html'
+import escapeHtml from 'escape-html'
 import prettyBytes from 'pretty-bytes'
 
 import path, { normalize, sep } from 'path'
