@@ -6,6 +6,10 @@ import path from 'node:path'
 export default defineConfig({
   root: '.',
 
+  // Relative asset paths are required for the file:// protocol used in
+  // production (Electron loads the built index.html directly from disk).
+  base: './',
+
   plugins: [
     // Vue 2 SFC support
     vue(),
@@ -27,7 +31,7 @@ export default defineConfig({
 
   build: {
     // Renderer output consumed by electron-builder (mirrors the webpack output path)
-    outDir: 'dist/vite/renderer',
+    outDir: 'dist/renderer',
     emptyOutDir: true,
     rollupOptions: {
       input: path.join(import.meta.dirname, 'index.html'),

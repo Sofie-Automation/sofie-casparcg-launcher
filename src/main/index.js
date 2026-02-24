@@ -115,7 +115,9 @@ if (configVersion < 2) {
 }
 
 let mainWindow
-const winURL = !isProduction ? `http://localhost:9080` : `file://${import.meta.dirname}/index.html`
+const winURL = !isProduction
+  ? `http://localhost:9080`
+  : `file://${path.join(import.meta.dirname, '../../dist/renderer/index.html')}`
 
 function createWindow() {
   /**
