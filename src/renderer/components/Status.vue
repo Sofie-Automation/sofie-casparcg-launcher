@@ -18,7 +18,6 @@
 </template>
 
 <script>
-import { ipcRenderer } from 'electron'
 import ProcessControls from './ProcessControls'
 
 export default {
@@ -31,7 +30,7 @@ export default {
     }
   },
   created() {
-    ipcRenderer.on('processes.get', (s, data) => {
+    window.electronAPI.on('processes.get', (data) => {
       this.processes = data || []
 
       // ensure they have all been init
@@ -39,7 +38,7 @@ export default {
         this.$store.dispatch('init', { id: p.id })
       }
     })
-    ipcRenderer.send('processes.get')
+    window.electronAPI.send('processes.get')
   },
 }
 </script>

@@ -322,7 +322,6 @@
 </template>
 
 <script>
-import { ipcRenderer } from 'electron'
 import packageJson from '../../../package.json'
 
 export default {
@@ -347,7 +346,7 @@ export default {
     }
   },
   created() {
-    ipcRenderer.on('config', (s, conf) => {
+    window.electronAPI.on('config', (conf) => {
       this.config = conf
 
       if (!this.config.api) {
@@ -357,7 +356,7 @@ export default {
         this.$set(this.config.api, 'staticPaths', [])
       }
     })
-    ipcRenderer.send('config.get')
+    window.electronAPI.send('config.get')
   },
 
   methods: {
@@ -365,11 +364,11 @@ export default {
       // TODO - some data validation (especially staticPaths)
 
       evt.preventDefault()
-      ipcRenderer.send('config.set', this.config)
+      window.electronAPI.send('config.set', this.config)
     },
     onReset(evt) {
       evt.preventDefault()
-      ipcRenderer.send('config.get')
+      window.electronAPI.send('config.get')
     },
     onAddStaticPathRow(evt) {
       evt.preventDefault()
@@ -390,11 +389,11 @@ export default {
     },
     onOpenBasePath(evt) {
       evt.preventDefault()
-      ipcRenderer.send('openPath', 'basePath')
+      window.electronAPI.send('openPath', 'basePath')
     },
     onOpenLogsPath(evt) {
       evt.preventDefault()
-      ipcRenderer.send('openPath', 'logsPath')
+      window.electronAPI.send('openPath', 'logsPath')
     },
     onAddEnvironmentVariable(index) {
       if (!this.config.processes[index].env) this.config.processes[index].env = []

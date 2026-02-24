@@ -23,7 +23,6 @@
 </template>
 
 <script>
-import { ipcRenderer } from 'electron'
 import ProcessControls from './ProcessControls'
 
 export default {
@@ -62,7 +61,7 @@ export default {
     },
     onSubmit(submitEvent) {
       const command = submitEvent.target.elements.command.value
-      ipcRenderer.send(this.$route.params.id + '.control', 'command', command)
+      window.electronAPI.send(this.$route.params.id + '.control', 'command', command)
       this.$refs.commandForm.reset()
     },
   },

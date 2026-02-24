@@ -126,7 +126,10 @@ function createWindow() {
     useContentSize: true,
     width: !isProduction ? 1600 : 1024,
     webPreferences: {
-      nodeIntegration: true, // TODO This needs to be removed asap
+      preload: path.join(import.meta.dirname, 'preload.cjs'),
+      contextIsolation: true,
+      sandbox: false, // preload needs require('electron')
+      nodeIntegration: false,
     },
   })
 

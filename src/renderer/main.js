@@ -1,8 +1,6 @@
 import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
 import VueChatScroll from 'vue-chat-scroll'
-import { ipcRenderer } from 'electron'
-
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
@@ -15,10 +13,10 @@ smoothscroll.polyfill()
 
 Vue.config.productionTip = false
 
-ipcRenderer.on('process.log', (e, data) => {
+window.electronAPI.on('process.log', (data) => {
   store.dispatch('logLine', JSON.parse(data))
 })
-ipcRenderer.on('process.status', (e, status) => {
+window.electronAPI.on('process.status', (status) => {
   store.dispatch('setStatus', JSON.parse(status))
 })
 
@@ -27,8 +25,7 @@ Vue.use(VueChatScroll)
 
 /* eslint-disable no-new */
 new Vue({
-  components: { App },
   router,
   store,
-  template: '<App/>',
+  render: (h) => h(App),
 }).$mount('#app')

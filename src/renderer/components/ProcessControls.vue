@@ -21,8 +21,6 @@
 </template>
 
 <script>
-import { ipcRenderer } from 'electron'
-
 export default {
   props: ['id', 'showClear'],
   data() {
@@ -38,13 +36,13 @@ export default {
       this.$store.dispatch('logClear', { id: this.id })
     },
     stop() {
-      ipcRenderer.send(this.id + '.control', 'stop')
+      window.electronAPI.send(this.id + '.control', 'stop')
     },
     start() {
-      ipcRenderer.send(this.id + '.control', 'start')
+      window.electronAPI.send(this.id + '.control', 'start')
     },
     restart() {
-      ipcRenderer.send(this.id + '.control', 'restart')
+      window.electronAPI.send(this.id + '.control', 'restart')
     },
   },
 }

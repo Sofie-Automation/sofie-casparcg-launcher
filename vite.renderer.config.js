@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue2'
-import renderer from 'vite-plugin-electron-renderer'
 import path from 'node:path'
 
 // https://vitejs.dev/config/
@@ -10,11 +9,6 @@ export default defineConfig({
   plugins: [
     // Vue 2 SFC support
     vue(),
-
-    // Allows using `import { ipcRenderer } from 'electron'` (and require()) in the renderer.
-    // In dev mode it provides virtual modules; in production it externalises them so
-    // Electron's nodeIntegration can resolve them via the native require().
-    renderer(),
   ],
 
   resolve: {

@@ -22,8 +22,6 @@
 </template>
 
 <script>
-import { ipcRenderer } from 'electron'
-
 export default {
   name: 'CasparcgLauncher',
   data() {
@@ -33,10 +31,10 @@ export default {
   },
 
   created() {
-    ipcRenderer.on('processes.get', (s, data) => {
+    window.electronAPI.on('processes.get', (data) => {
       this.processes = data || []
     })
-    ipcRenderer.send('processes.get')
+    window.electronAPI.send('processes.get')
   },
 }
 </script>
