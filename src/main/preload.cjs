@@ -14,8 +14,9 @@ const { contextBridge, ipcRenderer } = require('electron')
  */
 contextBridge.exposeInMainWorld('electronAPI', {
 	on(channel, callback) {
-		// TODO - do we need to be able to remove listeners?
-		ipcRenderer.on(channel, (_event, ...args) => callback(...args))
+		const listener = (_event, ...args) => callback(...args)
+		ipcRenderer.on(channel, listener)
+		return () => ipcRenderer.removeListener(channel, listener)
 	},
 
 	send(channel, ...args) {
