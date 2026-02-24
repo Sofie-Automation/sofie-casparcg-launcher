@@ -2,7 +2,7 @@ import log from 'electron-log'
 import respawn from './respawn/index.cjs'
 import path from 'path'
 import fs from 'fs'
-import stringArgv from 'string-argv'
+import { parseArgsStringToArgv } from 'string-argv'
 import equal from 'deep-equal'
 import moment from 'moment'
 
@@ -93,7 +93,7 @@ export class ProcessMonitor {
     const cwd = path.dirname(procPath)
     const exeName = path.basename(procPath)
     const args = this.config.args || ''
-    this.process = respawn([exeName].concat(stringArgv(args)), {
+    this.process = respawn([exeName].concat(parseArgsStringToArgv(args)), {
       cwd,
       env: this.config.env ? Object.fromEntries(this.config.env.map((obj) => [obj.id, obj.value])) : undefined,
     })
