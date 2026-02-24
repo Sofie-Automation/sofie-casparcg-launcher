@@ -1,12 +1,12 @@
 import log from 'electron-log'
-import respawn from './respawn'
+import respawn from './respawn/index.cjs'
 import path from 'path'
 import fs from 'fs'
 import stringArgv from 'string-argv'
 import equal from 'deep-equal'
 import moment from 'moment'
 
-import { CasparCGHealthMonitor } from './casparcg'
+import { CasparCGHealthMonitor } from './casparcg.js'
 
 export class ProcessMonitor {
   constructor(id, ipcWrapper, config) {

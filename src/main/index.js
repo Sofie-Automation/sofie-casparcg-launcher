@@ -5,9 +5,9 @@ import fs from 'fs'
 import path from 'path'
 import OS from 'os'
 
-import { ProcessMonitor } from './process'
-import { HttpMonitor } from './http'
-import { getExeDir, getLogsPath, getBasePath } from './util'
+import { ProcessMonitor } from './process.js'
+import { HttpMonitor } from './http.js'
+import { getExeDir, getLogsPath, getBasePath } from './util.js'
 
 const isProduction = process.env.NODE_ENV !== 'development'
 
@@ -16,7 +16,7 @@ const isProduction = process.env.NODE_ENV !== 'development'
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
  */
 if (isProduction) {
-  global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
+  global.__static = path.join(import.meta.dirname, '/static').replace(/\\/g, '\\\\')
 }
 
 log.transports.file.level = 'info'
@@ -115,7 +115,7 @@ if (configVersion < 2) {
 }
 
 let mainWindow
-const winURL = !isProduction ? `http://localhost:9080` : `file://${__dirname}/index.html`
+const winURL = !isProduction ? `http://localhost:9080` : `file://${import.meta.dirname}/index.html`
 
 function createWindow() {
   /**

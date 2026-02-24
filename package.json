@@ -1,10 +1,11 @@
 {
   "name": "casparcg-launcher",
-  "version": "1.2.0",
+  "version": "2.0.0-0",
   "author": "Julian Waller <julian@superfly.tv>",
   "description": "Simple launcher for CasparCG",
   "license": "MIT",
   "main": "./dist/electron/main.js",
+  "type": "module",
   "scripts": {
     "build": "node .electron-vue/build.js && electron-builder",
     "build:dir": "node .electron-vue/build.js && electron-builder --dir",
@@ -31,7 +32,9 @@
       {
         "from": "static/",
         "to": "static",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "dmg": {
@@ -95,10 +98,10 @@
     "css-loader": "^3.5.3",
     "del": "^5.1.0",
     "devtron": "^1.4.0",
-    "electron": "^9.0.1",
+    "electron": "40.6.0",
     "electron-builder": "^22.7.0",
     "electron-debug": "^3.1.0",
-    "electron-devtools-installer": "^3.0.0",
+    "electron-devtools-installer": "^4.0.0",
     "eslint": "^7.1.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-loader": "^4.0.2",
@@ -110,7 +113,6 @@
     "mini-css-extract-plugin": "^0.9.0",
     "multispinner": "^0.2.1",
     "node-loader": "^0.6.0",
-    "node-sass": "^4.9.2",
     "prettier": "^2.0.5",
     "sass-loader": "^8.0.2",
     "standard-version": "^8.0.0",
@@ -127,6 +129,7 @@
     "webpack-merge": "^4.1.3"
   },
   "engines": {
-    "node": "^16.0.0"
-  }
+    "node": "^24"
+  },
+  "packageManager": "yarn@4.12.0"
 }

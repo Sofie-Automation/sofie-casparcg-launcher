@@ -5,7 +5,7 @@ import prettyBytes from 'pretty-bytes'
 import path, { normalize, sep } from 'path'
 
 export const serveIndexTemplate = (locals, callback) => {
-  fs.readFile(path.join(__dirname, '../../../static/directory.html'), 'utf8', (err, str) => {
+  fs.readFile(path.join(import.meta.dirname, '../../../static/directory.html'), 'utf8', (err, str) => {
     if (err) {
       return callback(err)
     }

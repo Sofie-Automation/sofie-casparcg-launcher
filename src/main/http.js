@@ -4,8 +4,8 @@ import serveIndex from 'serve-index'
 import fs from 'fs'
 import log from 'electron-log'
 
-import { getBasePath } from './util'
-import { serveIndexTemplate } from './serveIndex'
+import { getBasePath } from './util.js'
+import { serveIndexTemplate } from './serveIndex/index.js'
 
 export class HttpMonitor {
   constructor(config, processes) {
