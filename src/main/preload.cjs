@@ -12,12 +12,12 @@ const { contextBridge, ipcRenderer } = require('electron')
  * listeners receive only the payload arguments.
  */
 contextBridge.exposeInMainWorld('electronAPI', {
-  on(channel, callback) {
-    // TODO - do we need to be able to remove listeners?
-    ipcRenderer.on(channel, (_event, ...args) => callback(...args))
-  },
+	on(channel, callback) {
+		// TODO - do we need to be able to remove listeners?
+		ipcRenderer.on(channel, (_event, ...args) => callback(...args))
+	},
 
-  send(channel, ...args) {
-    ipcRenderer.send(channel, ...args)
-  },
+	send(channel, ...args) {
+		ipcRenderer.send(channel, ...args)
+	},
 })

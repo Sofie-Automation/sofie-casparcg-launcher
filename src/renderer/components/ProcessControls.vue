@@ -4,18 +4,10 @@
       {{ data.status }}
     </span>
     <b-button-group>
-      <b-button v-if="showClear" variant="warning" @click="clearLog">
-        Clear Log
-      </b-button>
-      <b-button variant="success" v-on:click="start">
-        Start
-      </b-button>
-      <b-button variant="danger" v-on:click="stop">
-        Stop
-      </b-button>
-      <b-button variant="info" v-on:click="restart">
-        Restart
-      </b-button>
+      <b-button v-if="showClear" variant="warning" @click="clearLog"> Clear Log </b-button>
+      <b-button variant="success" v-on:click="start"> Start </b-button>
+      <b-button variant="danger" v-on:click="stop"> Stop </b-button>
+      <b-button variant="info" v-on:click="restart"> Restart </b-button>
     </b-button-group>
   </div>
 </template>

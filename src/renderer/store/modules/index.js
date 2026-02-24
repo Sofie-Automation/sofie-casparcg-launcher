@@ -7,9 +7,9 @@ const files = import.meta.glob('./*.js', { eager: true })
 const modules = {}
 
 for (const [path, module] of Object.entries(files)) {
-  const key = path.replace(/(\.\/|\.js)/g, '')
-  if (key === 'index') continue
-  modules[key] = module.default
+	const key = path.replace(/(\.\/|\.js)/g, '')
+	if (key === 'index') continue
+	modules[key] = module.default
 }
 
 export default modules
