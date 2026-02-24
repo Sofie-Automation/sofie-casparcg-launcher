@@ -6,6 +6,7 @@
   "license": "MIT",
   "main": "./src/main/index.js",
   "type": "module",
+  "homepage": "https://github.com/Sofie-Automation/sofie-casparcg-launcher#readme",
   "scripts": {
     "prepare": "husky",
     "build": "yarn build:vite && electron-builder --publish never",
