@@ -63,6 +63,14 @@
     "linux": {
       "icon": "build/icons",
       "target": "AppImage"
+    },
+    "electronFuses": {
+      "runAsNode": false,
+      "enableCookieEncryption": true,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "onlyLoadAppFromAsar": true,
+      "grantFileProtocolExtraPrivileges": false
     }
   },
   "prettier": "@sofie-automation/code-standard-preset/.prettierrc.json",
@@ -71,14 +79,13 @@
       "prettier --write"
     ],
     "*.{ts,tsx,js,jsx}": [
-      "run lint:raw --fix"
+      "yarn lint:raw --fix"
     ]
   },
   "dependencies": {
     "bootstrap-vue": "^2.15.0",
     "conf": "^15.1.0",
     "deep-equal": "^2.2.3",
-    "electron": "40.6.0",
     "electron-log": "^5.4.3",
     "escape-html": "^1.0.3",
     "express": "^5.2.1",
@@ -98,6 +105,7 @@
     "@sofie-automation/code-standard-preset": "^3.2.1",
     "@vitejs/plugin-vue2": "^2.3.4",
     "chokidar": "^4.0.3",
+    "electron": "40.6.0",
     "electron-builder": "^26.8.1",
     "electron-debug": "^4.1.0",
     "electron-devtools-installer": "^4.0.0",

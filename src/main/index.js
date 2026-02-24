@@ -1,13 +1,22 @@
-import { app, BrowserWindow, ipcMain, dialog, shell } from 'electron'
+// eslint-disable-next-line n/no-unpublished-import
+import { app, BrowserWindow, ipcMain, dialog, shell, protocol, net } from 'electron'
 import Conf from 'conf'
 import log from 'electron-log'
 import fs from 'fs'
 import path from 'path'
+import { pathToFileURL } from 'url'
 import OS from 'os'
 
 import { ProcessMonitor } from './process.js'
 import { HttpMonitor } from './http.js'
 import { getExeDir, getLogsPath, getBasePath } from './util.js'
+
+// Register the custom app:// scheme used to serve the renderer bundle in production.
+// Must be called before the app 'ready' event.
+// We use this instead of file:// to avoid needing grantFileProtocolExtraPrivileges (fuse)
+protocol.registerSchemesAsPrivileged([
+	{ scheme: 'app', privileges: { secure: true, standard: true, supportFetchAPI: true } },
+])
 
 const isProduction = process.env.NODE_ENV !== 'development'
 
@@ -115,9 +124,9 @@ if (configVersion < 2) {
 }
 
 let mainWindow
-const winURL = !isProduction
-	? `http://localhost:9080`
-	: `file://${path.join(import.meta.dirname, '../../dist/renderer/index.html')}`
+// In production the renderer is served via the custom app:// protocol (see below)
+// rather than file:// so that grantFileProtocolExtraPrivileges can stay disabled.
+const winURL = !isProduction ? `http://localhost:9080` : `app://localhost/index.html`
 
 function createWindow() {
 	/**
@@ -175,7 +184,18 @@ function createWindow() {
 	})
 }
 
-app.on('ready', createWindow)
+app.on('ready', () => {
+	if (isProduction) {
+		// Serve the built renderer files through app:// so we don't depend on
+		// file:// protocol extra privileges (grantFileProtocolExtraPrivileges fuse).
+		protocol.handle('app', (request) => {
+			const { pathname } = new URL(request.url)
+			const filePath = path.join(import.meta.dirname, '../../dist/renderer', decodeURIComponent(pathname))
+			return net.fetch(pathToFileURL(filePath).toString())
+		})
+	}
+	createWindow()
+})
 
 app.on('window-all-closed', () => {
 	if (process.platform !== 'darwin') {
