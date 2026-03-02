@@ -116,9 +116,19 @@ jobs:
           }
 
           // Strip the heading line itself — the release title already shows the version.
-          const body = latest.split('\n').slice(1).join('\n').trim()
-          writeFileSync('release-notes.md', body)
-          console.log('Extracted release notes:\n' + body)
+          const lines = latest.split('\n')
+          const headingLine = lines[0]
+          const body = lines.slice(1).join('\n').trim()
+
+          // Extract the compare URL from the heading: ## [x.y.z](url) (date)
+          const urlMatch = headingLine.match(/\[.*?\]\((https?:\/\/[^)]+)\)/)
+          const fullChangelog = urlMatch
+            ? `\n\n**Full Changelog**: ${urlMatch[1]}`
+            : ''
+
+          const output = body + fullChangelog
+          writeFileSync('release-notes.md', output)
+          console.log('Extracted release notes:\n' + output)
           EOF
 
       - name: Create or update GitHub release
