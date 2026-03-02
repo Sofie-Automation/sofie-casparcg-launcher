@@ -58,6 +58,7 @@ var Monitor = function (command, opts) {
 	this.stderr = opts.stderr
 	this.silent = opts.silent
 	this.windowsVerbatimArguments = opts.windowsVerbatimArguments
+	this.detached = opts.detached || false
 	this.spawnFn = opts.fork ? fork : spawn
 
 	this.crashed = false
@@ -121,6 +122,7 @@ Monitor.prototype.start = function () {
 			stdio: self.stdio,
 			silent: self.silent,
 			windowsVerbatimArguments: self.windowsVerbatimArguments,
+			detached: self.detached,
 		})
 
 		self.started = new Date()
@@ -195,6 +197,37 @@ Monitor.prototype.start = function () {
 	loop()
 
 	if (this.status === 'running') this.emit('start')
+}
+
+// Synchronously kill the child and its entire process group without waiting
+// for ps-tree. Sets status to 'stopping' first so the exit handler does not
+// schedule a restart.
+Monitor.prototype.killSync = function (sig) {
+	if (this.status === 'stopped') return
+	this.status = 'stopping'
+	clearTimeout(this.timeout)
+
+	var child = this.child
+	if (!child) return this._stopped()
+
+	var pid = child.pid
+	sig = sig || 'SIGKILL'
+
+	// If the process was spawned with detached:true it is its own process group
+	// leader, so kill(-pgid) reaches the full descendant tree.
+	if (this.detached) {
+		try {
+			process.kill(-pid, sig)
+		} catch (_) {
+			// do nothing
+		}
+	}
+	// Always kill the direct child as a fallback.
+	try {
+		process.kill(pid, sig)
+	} catch (_) {
+		// do nothing
+	}
 }
 
 Monitor.prototype.write = function (command, encoding) {

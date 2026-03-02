@@ -190,10 +190,17 @@ app.on('ready', () => {
 	createWindow()
 })
 
+// before-quit fires for every quit path: user closes window, app.quit(),
+// AND Electron's built-in SIGTERM handler. This is the only hook that
+// reliably runs synchronously before the process exits.
+app.on('before-quit', () => {
+	log.info('before-quit: killing child processes synchronously')
+	stopProcesses()
+	httpMonitor.stop()
+})
+
 app.on('window-all-closed', () => {
 	if (process.platform !== 'darwin') {
-		stopProcesses()
-		httpMonitor.stop()
 		app.quit()
 	}
 })
@@ -314,7 +321,7 @@ function startupProcesses() {
 }
 
 function stopProcesses() {
-	for (let proc in processes) {
-		processes[proc].stop()
+	for (const mon of Object.values(processes)) {
+		mon.killSync()
 	}
 }

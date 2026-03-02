@@ -95,6 +95,11 @@ export class ProcessMonitor {
 		this.process = respawn([exeName].concat(parseArgsStringToArgv(args)), {
 			cwd,
 			env: this.config.env ? Object.fromEntries(this.config.env.map((obj) => [obj.id, obj.value])) : undefined,
+			// On POSIX, spawn as a new process group leader so that a single
+			// process.kill(-pid, signal) from the SIGTERM handler reaches the
+			// entire child process tree (grandchildren included). On Windows,
+			// respawn already uses "taskkill /T /F" to kill the full tree.
+			detached: process.platform !== 'win32',
 		})
 
 		this.process.on('start', () => {
@@ -132,11 +137,38 @@ export class ProcessMonitor {
 		})
 		this.process.on('spawn', (process) => {
 			log.info('[' + this.id + '] ' + this.config.exeName + ' spawn ' + process.pid)
-
 			this.pipeLog('event', '== Process is starting ==')
+
+			// Cancel any pending startup commands from a previous spawn
+			clearTimeout(this._startupCommandsTimeout)
+			this._startupCommandsTimeout = undefined
+
+			const startupCommands = this.config.startupCommands
+			if (startupCommands && this.config.sendCommands) {
+				const commands = startupCommands
+					.split('\n')
+					.map((l) => l.trim())
+					.filter((l) => l.length > 0)
+				if (commands.length > 0) {
+					const delay = this.config.startupCommandsDelay || 0
+					this._startupCommandsTimeout = setTimeout(() => {
+						this._startupCommandsTimeout = undefined
+						if (this.running()) {
+							log.info('[' + this.id + '] Sending ' + commands.length + ' startup command(s) (delay: ' + delay + 'ms)')
+							this.pipeLog('event', '== Sending startup commands ==')
+							for (const cmd of commands) {
+								this.sendCommand(cmd)
+							}
+						}
+					}, delay)
+				}
+			}
 		})
 		this.process.on('exit', (code, signal) => {
 			log.info('[' + this.id + '] ' + this.config.exeName + ' exit ' + code + ' ' + signal)
+
+			clearTimeout(this._startupCommandsTimeout)
+			this._startupCommandsTimeout = undefined
 
 			this.pipeLog('event', '== Process has exited with code ' + code + ' ==')
 		})
@@ -164,6 +196,13 @@ export class ProcessMonitor {
 		}
 	}
 
+	/** Synchronously kill the child process tree without waiting for ps-tree. */
+	killSync() {
+		if (this.process) {
+			this.process.killSync()
+		}
+	}
+
 	restart() {
 		if (this.restarting) {
 			log.info('[' + this.id + '] attempt to restart whilst already restarting')
@@ -177,8 +216,13 @@ export class ProcessMonitor {
 	}
 
 	sendCommand(command) {
-		if (this.process && this.config.sendCommands) {
-			this.process.write(command, this.config.sendCommands)
+		let sendCommandFormat = this.config.sendCommands
+		if (this.process && sendCommandFormat) {
+			if (process.platform === 'linux' && sendCommandFormat === 'utf16le') {
+				sendCommandFormat = 'utf8' // CasparCG uses utf8 on linux utf16le
+			}
+
+			this.process.write(command, sendCommandFormat)
 		}
 	}
 
