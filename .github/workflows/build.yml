@@ -101,9 +101,10 @@ jobs:
 
           const changelog = readFileSync('CHANGELOG.md', 'utf8')
 
-          // Split on the version heading lines (## [x.y.z] or ## x.y.z)
-          // Keep the delimiter by using a lookahead so we can re-attach it.
-          const parts = changelog.split(/(?=^## )/m)
+          // Split on version heading lines only (## [x.y.z] or ## x.y.z).
+          // Using a digit lookahead avoids splitting on non-version ## headings
+          // such as "## Breaking changes" which updateVersion.mjs also emits.
+          const parts = changelog.split(/(?=^## \[?\d)/m)
 
           // parts[0] is the preamble ("# Changelog\n\n..."), parts[1] is latest version, etc.
           const latest = parts.find((p) => p.startsWith('## '))
