@@ -9,6 +9,9 @@ var os = require('os')
 
 var kill = function (pid, sig) {
 	if (os.platform() === 'win32') {
+		// Ensure input is a number, preventing command injection
+		if (!Number.isFinite(pid)) return
+
 		exec('taskkill /pid ' + pid + ' /T /F')
 		return
 	}

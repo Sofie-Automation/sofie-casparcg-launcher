@@ -101,12 +101,12 @@ if (configVersion < 1) {
 }
 if (configVersion < 2) {
 	const processes = config.get('processes')
-	for (let process of processes) {
-		if (!('sendCommands' in process)) {
-			if (process.id === 'scanner') {
-				process.sendCommands = undefined
+	for (let proc of processes) {
+		if (!('sendCommands' in proc)) {
+			if (proc.id === 'scanner') {
+				proc.sendCommands = undefined
 			} else {
-				process.sendCommands = 'utf8'
+				proc.sendCommands = 'utf8'
 			}
 		}
 	}
@@ -165,9 +165,8 @@ function createWindow() {
 	})
 
 	// Block new windows being opened on ctrl/shift/alt+click or middle-click
-	// Note: this does stop navigation too, but is safer than forcing mainWindow to the new url
-	mainWindow.webContents.on('new-window', (e) => {
-		e.preventDefault()
+	mainWindow.webContents.setWindowOpenHandler(() => {
+		return { action: 'deny' }
 	})
 
 	mainWindow.webContents.once('did-finish-load', () => {
@@ -224,8 +223,12 @@ class IpcWrapper {
 
 let processes = {}
 let httpMonitor = new HttpMonitor(config, processes)
+let started = false
 
 function startupProcesses() {
+	if (started) return
+	started = true
+
 	log.info('Starting child processes')
 
 	const wrapper = new IpcWrapper(ipcMain, mainWindow.webContents)
@@ -315,23 +318,3 @@ function stopProcesses() {
 		processes[proc].stop()
 	}
 }
-
-/**
- * Auto Updater
- *
- * Uncomment the following code below and install `electron-updater` to
- * support auto updating. Code Signing with a valid certificate is required.
- * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
- */
-
-/*
-import { autoUpdater } from 'electron-updater'
-
-autoUpdater.on('update-downloaded', () => {
-  autoUpdater.quitAndInstall()
-})
-
-app.on('ready', () => {
-  if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
-})
- */
