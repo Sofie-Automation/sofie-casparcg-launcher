@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [Convential Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification) for commit guidelines.
 
+## [2.0.0](https://github.com/Sofie-Automation/sofie-casparcg-launcher/compare/v1.2.0...v2.0.0) (Mon Mar 02 2026)
+
+
+### Features
+
+* startup commands [dfc21af](https://github.com/Sofie-Automation/sofie-casparcg-launcher/commit/dfc21af0341125c7ef69acb1d1bd8a31dcb16d84)
+* update express [7adf76b](https://github.com/Sofie-Automation/sofie-casparcg-launcher/commit/7adf76b41edbdc045558a31ea502489b84e84526)
+* **(EAV-630)** show more information on index pages [ac71a92](https://github.com/Sofie-Automation/sofie-casparcg-launcher/commit/ac71a92add17d3f208c1670ff9108a07b42acb2a)
+
+### Fixes
+
+* child processes not stopping during dev restart [313375c](https://github.com/Sofie-Automation/sofie-casparcg-launcher/commit/313375ca748cc1545712127a9a09056b3b816cb2)
+* character encoding on linux [8a51b65](https://github.com/Sofie-Automation/sofie-casparcg-launcher/commit/8a51b6500eb6b72cb177b3df205d3d7eb8460a56)
+* leak in listeners in vue [064f915](https://github.com/Sofie-Automation/sofie-casparcg-launcher/commit/064f915efbeaa12890c2705ba9ed5734bda6abfd)
+* directory.html file path in build [8b77670](https://github.com/Sofie-Automation/sofie-casparcg-launcher/commit/8b7767093dd18145cf6eb226df3735fbe0096ff6)
+* enable fuses for electron build [33b17c9](https://github.com/Sofie-Automation/sofie-casparcg-launcher/commit/33b17c9aeb110d03a79e50afaac0e68d491ac2fd)
+* refine dev script [da20694](https://github.com/Sofie-Automation/sofie-casparcg-launcher/commit/da206946484f257fc55bcc3b5fc387838de3e38e)
+* crash [1f47797](https://github.com/Sofie-Automation/sofie-casparcg-launcher/commit/1f47797fa4f264e1c2686e2842d7dd21f7f8fb9f)
+
 ## [1.2.0](https://github.com/Sofie-Automation/sofie-casparcg-launcher/compare/v1.1.0...v1.2.0) (2024-12-16)
 
 ### Features
