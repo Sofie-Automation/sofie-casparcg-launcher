@@ -1,111 +1,119 @@
 import fs from 'fs'
-import * as escapeHtml from 'escape-html'
+import escapeHtml from 'escape-html'
 import prettyBytes from 'pretty-bytes'
 
 import path, { normalize, sep } from 'path'
+// eslint-disable-next-line n/no-unpublished-import
+import { app } from 'electron'
+
+// In production, static/ is copied to resources/static/ via extraResources.
+// In dev, it lives at the project root (three levels up from src/main/serveIndex/).
+const staticDir = app.isPackaged
+	? path.join(process.resourcesPath, 'static')
+	: path.join(import.meta.dirname, '../../../static')
 
 export const serveIndexTemplate = (locals, callback) => {
-  fs.readFile(path.join(__dirname, '../../../static/directory.html'), 'utf8', (err, str) => {
-    if (err) {
-      return callback(err)
-    }
-    const html = str
-      .replace(/\{\{style\}\}/g, locals.style)
-      .replace(/\{\{linked-path\}\}/g, htmlPath(locals.directory))
-      .replace(/\{\{directory\}\}/g, locals.directory)
-      .replace(/\{\{files\}\}/g, createHtmlFileList(locals.fileList, locals.directory, locals.viewName))
-    callback(err, html)
-  })
+	fs.readFile(path.join(staticDir, 'directory.html'), 'utf8', (err, str) => {
+		if (err) {
+			return callback(err)
+		}
+		const html = str
+			.replace(/\{\{style\}\}/g, locals.style)
+			.replace(/\{\{linked-path\}\}/g, htmlPath(locals.directory))
+			.replace(/\{\{directory\}\}/g, locals.directory)
+			.replace(/\{\{files\}\}/g, createHtmlFileList(locals.fileList, locals.directory, locals.viewName))
+		callback(err, html)
+	})
 }
 
 function htmlPath(dir) {
-  var parts = dir.split('/')
-  var crumb = new Array(parts.length)
+	var parts = dir.split('/')
+	var crumb = new Array(parts.length)
 
-  for (var i = 0; i < parts.length; i++) {
-    var part = parts[i]
+	for (var i = 0; i < parts.length; i++) {
+		var part = parts[i]
 
-    if (part) {
-      parts[i] = encodeURIComponent(part)
-      crumb[i] = '<a href="' + escapeHtml(parts.slice(0, i + 1).join('/')) + '">' + escapeHtml(part) + '</a>'
-    }
-  }
+		if (part) {
+			parts[i] = encodeURIComponent(part)
+			crumb[i] = '<a href="' + escapeHtml(parts.slice(0, i + 1).join('/')) + '">' + escapeHtml(part) + '</a>'
+		}
+	}
 
-  return crumb.join(' / ')
+	return crumb.join(' / ')
 }
 
 function createHtmlFileList(files, dir, view) {
-  var html =
-    '<ul id="files" class="view-' +
-    escapeHtml(view) +
-    '">' +
-    (view === 'details'
-      ? '<li id="header" class="header">' +
-        '<span class="name">Name</span>' +
-        '<span class="size">Size</span>' +
-        '<span class="date">Modified</span>' +
-        '</li>'
-      : '')
+	var html =
+		'<ul id="files" class="view-' +
+		escapeHtml(view) +
+		'">' +
+		(view === 'details'
+			? '<li id="header" class="header">' +
+				'<span class="name">Name</span>' +
+				'<span class="size">Size</span>' +
+				'<span class="date">Modified</span>' +
+				'</li>'
+			: '')
 
-  html += files
-    .map(function (file) {
-      var classes = []
-      var isDir = file.stat && file.stat.isDirectory()
-      var path = dir.split('/').map(function (c) {
-        return encodeURIComponent(c)
-      })
+	html += files
+		.map(function (file) {
+			var classes = []
+			var isDir = file.stat && file.stat.isDirectory()
+			var path = dir.split('/').map(function (c) {
+				return encodeURIComponent(c)
+			})
 
-      path.push(encodeURIComponent(file.name))
+			path.push(encodeURIComponent(file.name))
 
-      var dateRaw = file.stat && file.name !== '..' ? file.stat.mtime.getTime() : ''
-      var date =
-        file.stat && file.name !== '..'
-          ? file.stat.mtime.toISOString().split('T')[0] +
-            ' ' +
-            file.stat.mtime.toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit',
-              hour12: false,
-            })
-          : ''
-      var sizeBytes = file.stat && !isDir ? file.stat.size : ''
-      var size = file.stat && !isDir ? prettyBytes(file.stat.size) : ''
+			var dateRaw = file.stat && file.name !== '..' ? file.stat.mtime.getTime() : ''
+			var date =
+				file.stat && file.name !== '..'
+					? file.stat.mtime.toISOString().split('T')[0] +
+						' ' +
+						file.stat.mtime.toLocaleTimeString([], {
+							hour: '2-digit',
+							minute: '2-digit',
+							second: '2-digit',
+							hour12: false,
+						})
+					: ''
+			var sizeBytes = file.stat && !isDir ? file.stat.size : ''
+			var size = file.stat && !isDir ? prettyBytes(file.stat.size) : ''
 
-      return (
-        '<li' +
-        (isDir ? ' class="directory"' : '') +
-        '><a href="' +
-        escapeHtml(normalizeSlashes(normalize(path.join('/')))) +
-        '" class="' +
-        escapeHtml(classes.join(' ')) +
-        '"' +
-        ' title="' +
-        escapeHtml(file.name) +
-        '">' +
-        '<span class="name">' +
-        escapeHtml(file.name) +
-        '</span>' +
-        '<span class="size" data-bytes="' +
-        escapeHtml(sizeBytes) +
-        '">' +
-        escapeHtml(size) +
-        '</span>' +
-        '<span class="date" data-timestamp="' +
-        escapeHtml(dateRaw) +
-        '">' +
-        escapeHtml(date) +
-        '</span>' +
-        '</a></li>'
-      )
-    })
-    .join('\n')
+			return (
+				'<li' +
+				(isDir ? ' class="directory"' : '') +
+				'><a href="' +
+				escapeHtml(normalizeSlashes(normalize(path.join('/')))) +
+				'" class="' +
+				escapeHtml(classes.join(' ')) +
+				'"' +
+				' title="' +
+				escapeHtml(file.name) +
+				'">' +
+				'<span class="name">' +
+				escapeHtml(file.name) +
+				'</span>' +
+				'<span class="size" data-bytes="' +
+				escapeHtml(sizeBytes) +
+				'">' +
+				escapeHtml(size) +
+				'</span>' +
+				'<span class="date" data-timestamp="' +
+				escapeHtml(dateRaw) +
+				'">' +
+				escapeHtml(date) +
+				'</span>' +
+				'</a></li>'
+			)
+		})
+		.join('\n')
 
-  html += '</ul>'
+	html += '</ul>'
 
-  return html
+	return html
 }
 
 function normalizeSlashes(path) {
-  return path.split(sep).join('/')
+	return path.split(sep).join('/')
 }

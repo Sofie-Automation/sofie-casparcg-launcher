@@ -11,5 +11,13 @@ yarn-error.log
 thumbs.db
 !.gitkeep
 logs/
+dist/
 
 casparcg-launcher.config.json
+
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks

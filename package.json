@@ -1,22 +1,23 @@
 {
   "name": "casparcg-launcher",
-  "version": "1.2.0",
+  "version": "2.0.0-0",
   "author": "Julian Waller <julian@superfly.tv>",
   "description": "Simple launcher for CasparCG",
   "license": "MIT",
-  "main": "./dist/electron/main.js",
+  "main": "./src/main/index.js",
+  "type": "module",
+  "homepage": "https://github.com/Sofie-Automation/sofie-casparcg-launcher#readme",
   "scripts": {
-    "build": "node .electron-vue/build.js && electron-builder",
-    "build:dir": "node .electron-vue/build.js && electron-builder --dir",
-    "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
-    "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",
-    "dev": "cross-env NODE_ENV=development node .electron-vue/dev-runner.js",
-    "lint": "eslint --ext .js,.vue src",
-    "lint:fix": "eslint --ext .js,.vue --fix src",
-    "pack": "npm run pack:main && npm run pack:renderer",
-    "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
-    "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
-    "release": "standard-version"
+    "prepare": "husky",
+    "build": "yarn build:vite && electron-builder --publish never",
+    "build:dir": "yarn build:vite && electron-builder --dir --publish never",
+    "dev": "node scripts/dev-vite.mjs",
+    "build:vite": "vite build --config vite.config.js",
+    "lint:raw": "eslint",
+    "lint": "run lint:raw .",
+    "lint-fix": "run lint --fix",
+    "license-validate": "sofie-licensecheck",
+    "release": "sofie-version"
   },
   "build": {
     "productName": "casparcg-launcher",
@@ -25,13 +26,17 @@
       "output": "build"
     },
     "files": [
-      "dist/electron/**/*"
+      "src/main/**/*",
+      "dist/renderer/**/*"
     ],
+    "asar": true,
     "extraResources": [
       {
         "from": "static/",
         "to": "static",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "dmg": {
@@ -59,74 +64,64 @@
     "linux": {
       "icon": "build/icons",
       "target": "AppImage"
+    },
+    "electronFuses": {
+      "runAsNode": false,
+      "enableCookieEncryption": true,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "onlyLoadAppFromAsar": true,
+      "grantFileProtocolExtraPrivileges": false
     }
+  },
+  "prettier": "@sofie-automation/code-standard-preset/.prettierrc.json",
+  "lint-staged": {
+    "*.{css,json,md,scss}": [
+      "prettier --write"
+    ],
+    "*.{ts,tsx,js,jsx}": [
+      "yarn lint:raw --fix"
+    ]
   },
   "dependencies": {
     "bootstrap-vue": "^2.15.0",
-    "conf": "^6.2.4",
-    "deep-equal": "^2.0.3",
-    "electron-log": "^4.2.0",
-    "express": "^4.16.3",
+    "conf": "^15.1.0",
+    "deep-equal": "^2.2.3",
+    "electron-log": "^5.4.3",
+    "escape-html": "^1.0.3",
+    "express": "^5.2.1",
     "jquery": "^3.3.1",
-    "moment": "^2.22.2",
-    "pretty-bytes": "5.6.0",
+    "pretty-bytes": "^7.1.0",
     "ps-tree": "^1.2.0",
-    "serve-index": "^1.7.2",
+    "serve-index": "^1.9.2",
     "smoothscroll-polyfill": "^0.4.3",
-    "string-argv": "^0.3.1",
-    "vue": "^2.5.16",
+    "string-argv": "^0.3.2",
+    "vue": "^2.7.0",
     "vue-chat-scroll": "^1.2.1",
-    "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
     "xtend": "^4.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0",
-    "@babel/preset-env": "^7.10.2",
-    "@babel/register": "^7.0.0",
-    "babel-eslint": "^10.1.0",
-    "babel-loader": "^8.1.0",
-    "babel-minify-webpack-plugin": "^0.3.1",
-    "cfonts": "^2.1.2",
-    "chalk": "^4.0.0",
-    "copy-webpack-plugin": "^6.0.1",
-    "cross-env": "^7.0.2",
-    "css-loader": "^3.5.3",
-    "del": "^5.1.0",
-    "devtron": "^1.4.0",
-    "electron": "^9.0.1",
-    "electron-builder": "^22.7.0",
-    "electron-debug": "^3.1.0",
-    "electron-devtools-installer": "^3.0.0",
-    "eslint": "^7.1.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-loader": "^4.0.2",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^3.1.3",
+    "@sofie-automation/code-standard-preset": "^3.2.1",
+    "@vitejs/plugin-vue2": "^2.3.4",
+    "chokidar": "^4.0.3",
+    "electron": "40.6.0",
+    "electron-builder": "^26.8.1",
+    "electron-debug": "^4.1.0",
+    "electron-devtools-installer": "^4.0.0",
+    "eslint": "^9.39.3",
     "eslint-plugin-vue": "^7.0.0-alpha.5",
-    "file-loader": "^6.0.0",
-    "html-webpack-plugin": "^4.3.0",
-    "mini-css-extract-plugin": "^0.9.0",
-    "multispinner": "^0.2.1",
-    "node-loader": "^0.6.0",
-    "node-sass": "^4.9.2",
-    "prettier": "^2.0.5",
-    "sass-loader": "^8.0.2",
-    "standard-version": "^8.0.0",
-    "style-loader": "^1.2.1",
-    "url-loader": "^4.1.0",
-    "vue-html-loader": "^1.2.4",
-    "vue-loader": "^15.2.4",
-    "vue-style-loader": "^4.1.0",
-    "vue-template-compiler": "^2.5.16",
-    "webpack": "^4.15.1",
-    "webpack-cli": "^3.0.8",
-    "webpack-dev-server": "^3.1.4",
-    "webpack-hot-middleware": "^2.22.2",
-    "webpack-merge": "^4.1.3"
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.1",
+    "sass-embedded": "^1.97.3",
+    "typescript": "~5.7.3",
+    "vite": "^7.3.1",
+    "vue-template-compiler": "^2.7.0"
   },
   "engines": {
-    "node": "^16.0.0"
-  }
+    "node": "^24"
+  },
+  "packageManager": "yarn@4.12.0"
 }
