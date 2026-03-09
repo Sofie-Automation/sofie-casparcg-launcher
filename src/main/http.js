@@ -119,7 +119,7 @@ export class HttpMonitor {
 							return
 						}
 
-						const fullPath = path.join(p.path, req.url)
+						const fullPath = path.join(p.path, req.path)
 						log.info('Deleting file: ' + fullPath)
 
 						fs.unlink(fullPath, (err) => {
